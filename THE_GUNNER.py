@@ -22,13 +22,14 @@ while state != QUIT:
     elif state == INCEPTION:
         state = inception_screen(window)
     elif state == GAME:
-        state = game_screen(window)
+        game_data = dict() # --> Inicializando dados do jogo. 
+        state = game_screen(window,game_data)
     elif state == TRYAGAIN:
         state = tryagain_screen(window)
     elif state == GAMEOVER:
         state = gameover_screen(window) 
     elif state == VICTORY:
-        state = victory_screen(window)
+        state = victory_screen(window,game_data)
     else:
         state = QUIT
 

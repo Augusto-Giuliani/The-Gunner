@@ -1,10 +1,10 @@
 # Importando as bibliotecas necessárias.
 import pygame as py
 import random as r
-from assets import load_assets, explosion_hit, explosion_miss, background,mission, call, plane_info, plane_sound, shell_info,tank_info,support,ruler
-from sprites import Enemy_tank, Explosion, Explosion2, Ground, Howitzer,  Mine, Sergeant, Plane
-from values import BLACK,EXPLODING, FPS, HEIGHT,PLAYING,QUIT,TRYAGAIN,VICTORY,RED,WIDTH,RULER_WIDTH,HOWITZER_WIDTH,PLANE_INFO_WIDTH
-from screens import pause_screen
+from assets import load_assets, explosion_hit, explosion_miss, background, tank_info, mission,plane_sound,missile_sound,plane_info,submarine_info,call,call2,shell_info,ruler,support
+from sprites import Enemy_tank, Explosion, Explosion2, Ground, Howitzer, Mine, Missile_Down, Plane, Sergeant
+from values import BLACK, EXPLODING, FPS, HEIGHT, HOWITZER_WIDTH, PLANE_INFO_WIDTH, PLAYING, QUIT, RED, RULER_WIDTH,TRYAGAIN,VICTORY,WIDTH,SUBMARINE_INFO_WIDTH
+from screens import pause_screen,ocean_screen
 
 # Criando a função com a estrutura fundamental do jogo.
 def game_screen(screen,game_data):
@@ -17,7 +17,6 @@ def game_screen(screen,game_data):
     all_enemies = py.sprite.Group()
     all_shells = py.sprite.Group()
     all_rockets = py.sprite.Group()
-
     groups = dict()
     groups['all_sprites'] = all_sprites
     groups['all_shells'] = all_shells
@@ -50,9 +49,15 @@ def game_screen(screen,game_data):
     topografic_support = False
     activate_topographic_support = False
     to_get_topographic_support = game_data['Mission']/2 # --> Quando chegar na metade do objetivo, o suporte topográfico poderá ser acionado.
+    # Criando variáveis que serão usadas em caso de suporte do submarino.
+    submarine_support = False
+    activate_submarine_support = False 
+    to_get_submarine_support = 3 # --> Quantos inimigos precisa destruír consecutivamente (sem erros) para conseguir suporte do submarino.
+    consecutive_hits_for_submarine_support = 0
     # Variável para tocar o som de suporte uma vez.
     support_sound_air = True
     support_sound_topo = True
+    support_sound_sub = True
     # Criando o inimigo.
     for i in range(3):
         enemy = Enemy_tank(assets,i+1)
@@ -109,6 +114,15 @@ def game_screen(screen,game_data):
                     elif activate_topographic_support and event.key == py.K_9:
                         topografic_support = True # --> Ativando suporte topográfico.
                         activate_topographic_support = False # --> Ícone some da tela.
+                    # Caso o suporte de submarino esteja "na espera" (ícone do submarino apareceu na tela), a tecla "0" vai ativá-lo.
+                    elif activate_submarine_support and event.key == py.K_0:
+                        assets[call2].play()
+                        submarine_support = True # --> Ativando suporte do submarino.
+                        activate_submarine_support = False # --> Ícone some da tela.
+                        STATE = ocean_screen(screen) # --> Mostra a tela do oceano com o submarino.
+                        assets[missile_sound].play()
+                        missile = Missile_Down(assets,(WIDTH/2,0)) # --> Assim quando volta para a tela original do jogo, aparece o míssel vindo do céu.
+                        all_sprites.add(missile)
                     # Caso o jogador queira uma pausa...
                     elif event.key == py.K_p:
                         STATE = pause_screen(screen)
@@ -124,7 +138,6 @@ def game_screen(screen,game_data):
             misses2 = py.sprite.spritecollide(floor, all_rockets, True, py.sprite.collide_mask)
             collision = py.sprite.spritecollide(player, all_enemies, True, py.sprite.collide_mask)
             mine_hit = py.sprite.spritecollide(mine, all_enemies, True, py.sprite.collide_mask)
-
             # O inimigo destruído precisa ser recriado.
             for enemy in hits:
                 consecutive_hits_for_air_support += 1
@@ -185,6 +198,27 @@ def game_screen(screen,game_data):
                 STATE = EXPLODING
                 explosion_tick = py.time.get_ticks()
                 explosion_duration = explosion_player.frame_ticks*len(explosion_player.explosion_anim2) + 1000
+            # Caso o míssel seja destruído, todo os inimigos que estão na tela morrem.
+            if submarine_support and not missile.alive():
+                # No lugar do míssel destruído, adicionando uma explosão.
+                explosion = Explosion2(missile.rect.centerx,missile.rect.centery - 40,assets)
+                all_sprites.add(explosion)
+                not_same = 1 # --> Evitar tanques iguais.
+                for enemy in all_enemies:
+                    enemy.kill()
+                    assets[explosion_hit].play()
+                    if enemy_created < game_data['Mission']: # --> Não aparecer inimigos a mais do que a missão já estebelece.
+                        if not_same >= 4:
+                            not_same = r.choice([1,2,3])
+                        e = Enemy_tank(assets,not_same)
+                        all_sprites.add(e)
+                        all_enemies.add(e)
+                        enemy_created += 1
+                        not_same+=1
+                    # No lugar do inimigo destruído, adicionando uma explosão.
+                    explosion = Explosion2(enemy.rect.centerx,enemy.rect.centery - 55,assets)
+                    all_sprites.add(explosion)
+                    enemy_down +=1
         elif STATE == EXPLODING:
             now = py.time.get_ticks()
             if now - explosion_tick > explosion_duration:
@@ -197,9 +231,17 @@ def game_screen(screen,game_data):
             activate_air_support = True
             support_sound_air = True
             consecutive_hits_for_air_support = 0
+        # Caso o número de inimigos destruídos consecutivamente seja atinjido, o suporte de submarino poderá ser ativado (modo de "espera"; ícone aparece).
+        if consecutive_hits_for_submarine_support == to_get_submarine_support and not submarine_support and not activate_submarine_support:
+            activate_submarine_support = True
+            support_sound_sub = True
+            consecutive_hits_for_submarine_support = 0
         # Caso o avião já tenha saído da tela...
         if air_support and player_plane.rect.x > WIDTH:
             air_support = False
+        # Caso o míssel já tenha saído da tela...
+        if submarine_support and not missile.alive():
+            submarine_support = False
         # Caso o número de inimigos destruídos atinja o previsto para suporte topográfico.
         if enemy_down >= to_get_topographic_support and not topografic_support:
             activate_topographic_support = True 
@@ -242,6 +284,13 @@ def game_screen(screen,game_data):
                 assets[support].play()
                 support_sound_topo = False
             screen.blit(assets[ruler],(WIDTH - RULER_WIDTH - 10,200 - 10)) # --> Ícone.
+        # Desenhando o ícone do submarino caso o suporte de submarino possa ser ativado.
+        if activate_submarine_support:
+            consecutive_hits_for_submarine_support = 0
+            if support_sound_sub:
+                assets[support].play()
+                support_sound_sub = False
+            screen.blit(assets[submarine_info],(WIDTH - SUBMARINE_INFO_WIDTH - 10,380)) # --> Ícone.
         # Caso o suporte topográfico seja ativado.
         if topografic_support:
             # Desenhando os números no chão para indicar os alcances de cada carga.
