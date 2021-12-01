@@ -1,0 +1,55 @@
+# Importando as bibliotecas necessárias.
+from os import path
+
+# Estabelecendo a pasta que contem as figuras/backgrounds e sons/trilha sonoras.
+IMG = path.join(path.dirname(__file__),'images')
+SOUND = path.join(path.dirname(__file__),'sounds')
+
+# Dados gerais.
+WIDTH = 1300 # --> Largura da tela
+HEIGHT = 700 # --> Altura da tela
+TANK_WIDTH = 80
+TANK_HEIGHT = 50
+TANK_INFO_WIDTH = 110
+TANK_INFO_HEIGHT = 90
+PLANE_WIDTH = 100
+PLANE_HEIGHT = 50
+PLANE_INFO_WIDTH = 110
+PLANE_INFO_HEIGHT = 80
+ROCKET_WIDTH = 30
+ROCKET_HEIGHT = 40
+MISSION_WIDTH = 155
+MISSION_HEIGHT = 110
+GROUND_HEIGHT = 30
+MINE_WIDTH = 10
+MINE_HEIGHT = 20
+HOWITZER_WIDTH = 45
+HOWITZER_HEIGHT = 30
+SERGEANT_WIDTH = 25
+SERGEANT_HEIGHT = 25
+SHELL_WIDTH = 6
+SHELL_HEIGHT = 6
+SHELL_INFO_WIDTH = 160
+SHELL_INFO_HEIGHT = 130
+RULER_WIDTH = 100
+RULER_HEIGHT = 100
+FPS = 50
+RED = (255,0,0)
+BLACK = (0,0,0)
+SUBMARINE_WIDTH = 700
+SUBMARINE_HEIGHT = 300
+SUBMARINE_INFO_WIDTH = 100
+SUBMARINE_INFO_HEIGHT = 100
+MISSILE_WIDTH = 100
+MISSILE_HEIGHT = 100
+
+# "Estados"/Estágios do jogo.
+INTRO = 1
+INCEPTION = 2
+GAME = 3
+PLAYING = 4
+EXPLODING = 5
+TRYAGAIN = 6
+VICTORY = 7
+GAMEOVER = 8
+QUIT = 0
