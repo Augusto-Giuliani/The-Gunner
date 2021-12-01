@@ -2,9 +2,9 @@
 import pygame as py
 import random as r
 from assets import load_assets, explosion_hit, explosion_miss, background
-from sprites import Enemy_tank, Explosion, Explosion2, Ground, Howitzer, Sergeant
-from values import EXPLODING, FPS, PLAYING, QUIT,TRYAGAIN,VICTORY
-
+from sprites import Enemy_tank, Explosion, Explosion2, Ground, Howitzer,  Mine, Sergeant
+from values import EXPLODING, FPS, HEIGHT, PLAYING, QUIT,TRYAGAIN,VICTORY
+from screens import pause_screen
 
 # Criando a função com a estrutura fundamental do jogo.
 def game_screen(screen):
@@ -28,6 +28,8 @@ def game_screen(screen):
     # Criando o "chão" e a mina.
     floor = Ground(assets)
     all_sprites.add(floor)
+    mine = Mine(assets)
+    all_sprites.add(mine)
     # Criando variável que contém o número de blindados/inimigos destruídos. 
     enemy_down = 0
     # Criando variável que contém o número de blindados/inimigos criados. 
@@ -73,6 +75,10 @@ def game_screen(screen):
                         player.shoot(6)
                     elif event.key == py.K_7:
                         player.shoot(7)
+                    
+                    # Caso o jogador queira uma pausa...
+                    elif event.key == py.K_p:
+                        STATE = pause_screen(screen)
 
         # Atualizando estado do jogo.
         all_sprites.update()
@@ -82,6 +88,8 @@ def game_screen(screen):
             hits = py.sprite.groupcollide(all_enemies, all_shells, True, True, py.sprite.collide_mask)
             misses = py.sprite.spritecollide(floor, all_shells, True, py.sprite.collide_mask)
             collision = py.sprite.spritecollide(player, all_enemies, True, py.sprite.collide_mask)
+            mine_hit = py.sprite.spritecollide(mine, all_enemies, True, py.sprite.collide_mask)
+
             # O inimigo destruído precisa ser recriado.
             for enemy in hits:
                 consecutive_hits_for_air_support += 1
@@ -95,6 +103,18 @@ def game_screen(screen):
                 explosion = Explosion2(enemy.rect.centerx,enemy.rect.centery - 55,assets)
                 all_sprites.add(explosion)
                 enemy_down +=1 
+            for enemy in mine_hit:
+                assets[explosion_hit].play()
+                mine.kill() # --> A mina some da tela, mas continua no mesmo lugar.
+                mine.rect.y = HEIGHT # --> Altera a posição da mina para que os outros inimigos possam colidir com o obuseiro.
+                e = Enemy_tank(assets,r.choice([1,2,3]))
+                all_sprites.add(e)
+                all_enemies.add(e)
+                enemy_created += 1
+                # No lugar do inimigo destruído, adicionando uma explosão.
+                explosion = Explosion2(enemy.rect.centerx,enemy.rect.centery - 55,assets)
+                all_sprites.add(explosion)
+                enemy_down +=1
             # Caso o projétil atinja o "chão".
             for shell in misses:
                 consecutive_hits_for_air_support = 0 
