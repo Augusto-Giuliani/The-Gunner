@@ -1,13 +1,13 @@
 # Importando as bibliotecas necessárias.
 import pygame as py
 import random as r
-from assets import load_assets, explosion_hit, explosion_miss, background
+from assets import load_assets, explosion_hit, explosion_miss, background,mission,shell_info,tank_info,support,ruler
 from sprites import Enemy_tank, Explosion, Explosion2, Ground, Howitzer,  Mine, Sergeant
-from values import EXPLODING, FPS, HEIGHT, PLAYING, QUIT,TRYAGAIN,VICTORY
+from values import EXPLODING, FPS, HEIGHT,PLAYING,QUIT,TRYAGAIN,VICTORY,RED,WIDTH,RULER_WIDTH,HOWITZER_WIDTH
 from screens import pause_screen
 
 # Criando a função com a estrutura fundamental do jogo.
-def game_screen(screen):
+def game_screen(screen,game_data):
     # Variável para o ajuste de velocidade do jogo (quantos fps).
     clock = py.time.Clock()
     # Carregando os assets.
@@ -34,6 +34,16 @@ def game_screen(screen):
     enemy_down = 0
     # Criando variável que contém o número de blindados/inimigos criados. 
     enemy_created = 0
+    # Criando variável que contém o número de tiros realizados, dentro do dicionário com dados do jogo. 
+    game_data['Shots taken'] = 0
+    # Criando variável que contém o número de blindados/inimigos que precisam ser destruídos para cumprir a missão, dentro do dicionário com dados do jogo. 
+    game_data['Mission'] = 20
+    # Criando variável que vai ser usada para o suporte topográfico (dar o alcance médio no terreno, de cada carga, para o jogador).
+    topografic_support = False
+    activate_topographic_support = False
+    to_get_topographic_support = game_data['Mission']/2 # --> Quando chegar na metade do objetivo, o suporte topográfico poderá ser acionado.
+    # Variável para tocar o som de suporte uma vez.
+    support_sound_topo = True
     # Criando o inimigo.
     for i in range(3):
         enemy = Enemy_tank(assets,i+1)
@@ -62,20 +72,23 @@ def game_screen(screen):
                 if event.type == py.KEYDOWN:
                     # A velocidade inicial do projétil varia de acordo com a carga de projeção escolhida (teclas 1-7). O jogador deve apertar a tecla de acordo com a carga que deseja.
                     if event.key == py.K_1:
-                        player.shoot(1) 
+                        player.shoot(1,game_data) 
                     elif event.key == py.K_2:
-                        player.shoot(2)
+                        player.shoot(2,game_data)
                     elif event.key == py.K_3:
-                        player.shoot(3)
+                        player.shoot(3,game_data)
                     elif event.key == py.K_4:
-                        player.shoot(4)
+                        player.shoot(4,game_data)
                     elif event.key == py.K_5:
-                        player.shoot(5)
+                        player.shoot(5,game_data)
                     elif event.key == py.K_6:
-                        player.shoot(6)
+                        player.shoot(6,game_data)
                     elif event.key == py.K_7:
-                        player.shoot(7)
-                    
+                        player.shoot(7,game_data)
+                    # Caso o suporte topográfico esteja "na espera" (ícone da régua apareceu na tela), a tecla "9" vai ativá-lo.
+                    elif activate_topographic_support and event.key == py.K_9:
+                        topografic_support = True # --> Ativando suporte topográfico.
+                        activate_topographic_support = False # --> Ícone some da tela.
                     # Caso o jogador queira uma pausa...
                     elif event.key == py.K_p:
                         STATE = pause_screen(screen)
@@ -95,10 +108,11 @@ def game_screen(screen):
                 consecutive_hits_for_air_support += 1
                 consecutive_hits_for_submarine_support += 1
                 assets[explosion_hit].play()
-                e = Enemy_tank(assets,r.choice([1,2,3]))
-                all_sprites.add(e)
-                all_enemies.add(e)
-                enemy_created += 1
+                if enemy_created < game_data['Mission']: # --> Não aparecer inimigos a mais do que a missão já estebelece.
+                    e = Enemy_tank(assets,r.choice([1,2,3]))
+                    all_sprites.add(e)
+                    all_enemies.add(e)
+                    enemy_created += 1
                 # No lugar do inimigo destruído, adicionando uma explosão.
                 explosion = Explosion2(enemy.rect.centerx,enemy.rect.centery - 55,assets)
                 all_sprites.add(explosion)
@@ -107,10 +121,11 @@ def game_screen(screen):
                 assets[explosion_hit].play()
                 mine.kill() # --> A mina some da tela, mas continua no mesmo lugar.
                 mine.rect.y = HEIGHT # --> Altera a posição da mina para que os outros inimigos possam colidir com o obuseiro.
-                e = Enemy_tank(assets,r.choice([1,2,3]))
-                all_sprites.add(e)
-                all_enemies.add(e)
-                enemy_created += 1
+                if enemy_created < game_data['Mission']: # --> Não aparecer inimigos a mais do que a missão já estebelece.
+                    e = Enemy_tank(assets,r.choice([1,2,3]))
+                    all_sprites.add(e)
+                    all_enemies.add(e)
+                    enemy_created += 1
                 # No lugar do inimigo destruído, adicionando uma explosão.
                 explosion = Explosion2(enemy.rect.centerx,enemy.rect.centery - 55,assets)
                 all_sprites.add(explosion)
@@ -138,14 +153,55 @@ def game_screen(screen):
             if now - explosion_tick > explosion_duration:
                 STATE = TRYAGAIN
         # Caso um número (mission) de blindados/inimigos seja destruído, vitória do usuário.
-        if enemy_down >= 10:
+        if enemy_down >= game_data['Mission']:
             STATE = VICTORY
+        # Caso o número de inimigos destruídos atinja o previsto para suporte topográfico.
+        if enemy_down >= to_get_topographic_support and not topografic_support:
+            activate_topographic_support = True 
         # Gerando as saídas...
         # Fundo.
         screen.blit(assets[background],(0,0))
         # Todo os sprites.
         all_sprites.draw(screen)
-        
+        # Informações úteis na tela...
+        font = py.font.SysFont(None,80)
+        font2 = py.font.SysFont(None,40)
+        # Desenhando o número de blindados/inimigos destruídos.
+        text_enemies_down = font.render('{:03d}'.format(enemy_down),True,RED)
+        text_rect = text_enemies_down.get_rect()
+        text_rect.bottomleft = (120,180)
+        screen.blit(text_enemies_down,text_rect) # --> Dado numérico.
+        screen.blit(assets[tank_info],(10,100)) # --> Ícone.
+        # Desenhando o número de blindados/inimigos que precisam ser destruídos.
+        text_mission = font.render('{:03d}'.format(game_data['Mission']),True,RED)
+        text_rect = text_mission.get_rect()
+        text_rect.bottomleft = (120,100)
+        screen.blit(text_mission,text_rect) # --> Dado numérico.
+        screen.blit(assets[mission],(-10,10)) # --> Ícone.
+        # Desenhando o número de disparos realizados.
+        text_shots = font.render('{:03d}'.format(game_data['Shots taken']),True,RED)
+        text_rect = text_mission.get_rect()
+        text_rect.bottomleft = (WIDTH - 110,130)
+        screen.blit(text_shots,text_rect) # --> Dado numérico.
+        screen.blit(assets[shell_info],(WIDTH - 240,20)) # --> Ícone.
+        # Desenhando o ícone da régua caso o suporte topográfico possa ser ativado.
+        if activate_topographic_support:
+            if support_sound_topo:
+                assets[support].play()
+                support_sound_topo = False
+            screen.blit(assets[ruler],(WIDTH - RULER_WIDTH - 10,200 - 10)) # --> Ícone.
+        # Caso o suporte topográfico seja ativado.
+        if topografic_support:
+            # Desenhando os números no chão para indicar os alcances de cada carga.
+            range_number_scale = font2.render('     1         2             3                  4                         5                            6                                 7',True,BLACK)
+            range_number_scale_rect = range_number_scale.get_rect()
+            range_number_scale_rect.bottomleft = (HOWITZER_WIDTH+50,HEIGHT-2)
+            screen.blit(range_number_scale,range_number_scale_rect) # --> Dado numérico.
+            # Desenhando as marcas de cada número do alcance.
+            range_number_scale_mark = font2.render('    |          |              |                   |                         |                             |                                  |',True,BLACK)
+            range_number_scale_mark_rect = range_number_scale_mark.get_rect()
+            range_number_scale_mark_rect.bottomleft = (HOWITZER_WIDTH+50,HEIGHT-4)
+            screen.blit(range_number_scale_mark,range_number_scale_mark_rect) # --> Marcas.
         # Atualizando os novos frames do jogo para o jogador/usuário.
         py.display.update()
     state = STATE # --> Convertendo de volta para o estado de jogo do arquivo THE GUNNER.
