@@ -235,9 +235,9 @@ def victory_screen(screen,game_data):
         # Número de tiros realizados, performance/eficiência (tiros por inimigo) e classificação.
         performance = game_data['Shots taken']/game_data['Mission']
         rating = ''
-        if performance <= 0.85:
+        if performance <= 1:
             rating = 'Gunner'
-        elif performance <= 1.35:
+        elif performance <= 1.5:
             rating = 'Profissional'
         elif performance <= 2:
             rating = 'Iniciante'
