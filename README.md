@@ -13,4 +13,4 @@ Planejamento das telas/screens do jogo:
 
 ![plot](images/planning_screens.png)
 
-### **Descrição:\nUm jogo de artilharia. O usuário será um sargento, que está sob o comando de uma peça de artilharia (no caso do jogo, um obuseiro). Seu objetivo é abater alvos inimigos que fazem parte de um movimento terrorista. O usuário poderá alterar a carga de projeção (que determina a velocidade do projétil/granada), acionar suportes que estão a sua disposição, dar pausa no jogo e receberá um feedback sobre a sua performance, em caso de vitória. Para jogar, rode o arquivo THE_GUNNER.py.**
+### **Descrição: Um jogo de artilharia. O usuário será um sargento, que está sob o comando de uma peça de artilharia (no caso do jogo, um obuseiro). Seu objetivo é abater alvos inimigos que fazem parte de um movimento terrorista. O usuário poderá alterar a carga de projeção (que determina a velocidade do projétil/granada), acionar suportes que estão a sua disposição, dar pausa no jogo e receberá um feedback sobre a sua performance, em caso de vitória. Para jogar, rode o arquivo THE_GUNNER.py.**
