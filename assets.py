@@ -44,7 +44,11 @@ missile_up = 'missile_up'
 missile_down = 'missile_down'
 missile_sound = 'missile_sound'
 ocean_background = 'ocean_background'
-
+danger = 'danger'
+big_enemy = 'big_enemy'
+big_enemy_hit = 'big_enemy_hit'
+details = 'details_screen'
+the_mission = 'the_mission_screen'
 # Criando a função que carrega os arquivos de cada asset em um dicionário.
 def load_assets():
     assets = dict()
@@ -54,6 +58,10 @@ def load_assets():
     assets[intro] = py.transform.scale(assets['intro_screen'],(WIDTH,HEIGHT))
     assets[inception] = py.image.load(os.path.join(IMG,'inception.png')).convert()
     assets[inception] = py.transform.scale(assets['inception_screen'],(WIDTH,HEIGHT))
+    assets[the_mission] = py.image.load(os.path.join(IMG,'the_mission.png')).convert()
+    assets[the_mission] = py.transform.scale(assets['the_mission_screen'],(WIDTH,HEIGHT))
+    assets[details] = py.image.load(os.path.join(IMG,'details.png')).convert()
+    assets[details] = py.transform.scale(assets['details_screen'],(WIDTH,HEIGHT))
     assets[gameover] = py.image.load(os.path.join(IMG,'gameover.png')).convert()
     assets[gameover] = py.transform.scale(assets['gameover_screen'],(WIDTH,HEIGHT))
     assets[tryagain] = py.image.load(os.path.join(IMG,'tryagain.png')).convert()
@@ -74,6 +82,8 @@ def load_assets():
     assets[tank2] = py.transform.scale(assets['tank2'],(TANK_WIDTH,TANK_HEIGHT + 6))
     assets[tank3] = py.image.load(os.path.join(IMG,'enemy_tank3.png')).convert_alpha()
     assets[tank3] = py.transform.scale(assets['tank3'],(TANK_WIDTH + 10,TANK_HEIGHT + 6))
+    assets[big_enemy] = py.image.load(os.path.join(IMG,'big_enemy.png')).convert_alpha()
+    assets[big_enemy] = py.transform.scale(assets['big_enemy'],(TANK_WIDTH + 50,TANK_HEIGHT + 10))
     assets[ground] = py.image.load(os.path.join(IMG,'ground.jpg')).convert()
     assets[ground] = py.transform.scale(assets['ground'],(WIDTH,GROUND_HEIGHT))
     assets[mine] = py.image.load(os.path.join(IMG,'mine.png')).convert_alpha()
@@ -144,6 +154,8 @@ def load_assets():
     assets[support] = py.mixer.Sound(os.path.join(SOUND,'support.mp3'))
     assets[submarine_sound] = py.mixer.Sound(os.path.join(SOUND,'submarine.mp3'))
     assets[missile_sound] = py.mixer.Sound(os.path.join(SOUND,'missile.mp3'))
+    assets[danger] = py.mixer.Sound(os.path.join(SOUND,'danger.mp3'))
+    assets[big_enemy_hit] = py.mixer.Sound(os.path.join(SOUND,'big_enemy_hit.mp3'))
     return assets
 
 

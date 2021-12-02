@@ -1,7 +1,7 @@
 # Importando as bibliotecas necessárias.
 import pygame as py
 import random as r
-from assets import shell,sergeant,howitzer,tank1,tank2,tank3,ground,shooting,shout,explosion_animation,explosion_animation2,plane,rocket_sound,rocket,smoke_animation,mine,submarine,missile_down,missile_up
+from assets import shell,sergeant,howitzer,tank1,tank2,tank3,ground,shooting,shout,explosion_animation,explosion_animation2,plane,rocket_sound,rocket,smoke_animation,mine,submarine,missile_down,missile_up,big_enemy
 from values import GROUND_HEIGHT, HEIGHT, HOWITZER_HEIGHT, HOWITZER_WIDTH, MINE_HEIGHT, PLANE_WIDTH, SERGEANT_HEIGHT, SERGEANT_WIDTH, SUBMARINE_WIDTH, TANK_HEIGHT, WIDTH
 
 # Criando o objeto Ground ("chão" do jogo).
@@ -133,6 +133,30 @@ class Enemy_tank(py.sprite.Sprite):
     # Atualiza a posição do inimigo.
     def update(self):
         self.rect.x += self.speedx
+
+# Criando o objeto inimigo Big_enemy. Esse blindado tem mais de uma vida (mais resistente).
+class Big_enemy(py.sprite.Sprite):
+    def __init__(self,assets): 
+        py.sprite.Sprite.__init__(self)
+        self.image = assets[big_enemy]     
+        self.mask = py.mask.from_surface(self.image)
+        # Posicionando o inimigo em cima do chão, vindo do canto direito da tela.
+        self.rect = self.image.get_rect()
+        self.rect.x = WIDTH
+        self.rect.y = (HEIGHT - GROUND_HEIGHT) - TANK_HEIGHT - 10
+        # Definindo a quantidade de vidas.
+        self.lives = 3
+        # Determinando a velocidade do inimigo (só mexe horizontalmente). 
+        self.speedx = r.choice([-0.5,-0.25,-0.1]) 
+    def HITS(self):
+        self.lives -= 1
+    # Atualiza a posição do inimigo.
+    def update(self):
+        self.rect.x += self.speedx
+        # Caso tenha perdido as vidas, morre.
+        if self.lives == 0:
+            self.kill()
+        
         
 # Criando uma classe para animação da Explosão 1.
 class Explosion(py.sprite.Sprite):

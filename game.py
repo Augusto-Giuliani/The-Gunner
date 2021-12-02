@@ -1,8 +1,8 @@
 # Importando as bibliotecas necessárias.
 import pygame as py
 import random as r
-from assets import load_assets, explosion_hit, explosion_miss, background, tank_info, mission,plane_sound,missile_sound,plane_info,submarine_info,call,call2,shell_info,ruler,support
-from sprites import Enemy_tank, Explosion, Explosion2, Ground, Howitzer, Mine, Missile_Down, Plane, Sergeant
+from assets import load_assets, explosion_hit, explosion_miss, background, tank_info, mission,plane_sound,missile_sound,plane_info,submarine_info,call,call2,shell_info,ruler,support,big_enemy,big_enemy_hit,danger
+from sprites import Big_enemy, Enemy_tank, Explosion, Explosion2, Ground, Howitzer, Mine, Missile_Down, Plane, Sergeant
 from values import BLACK, EXPLODING, FPS, HEIGHT, HOWITZER_WIDTH, PLANE_INFO_WIDTH, PLAYING, QUIT, RED, RULER_WIDTH,TRYAGAIN,VICTORY,WIDTH,SUBMARINE_INFO_WIDTH
 from screens import pause_screen,ocean_screen
 
@@ -36,6 +36,9 @@ def game_screen(screen,game_data):
     enemy_down = 0
     # Criando variável que contém o número de blindados/inimigos criados. 
     enemy_created = 0
+    enemy_down_now = 0
+    # Criando variável com a quantidade de inimigos que precisam ser destruídos para o Big_enemy aparecer.
+    to_Big_enemy_appear = 5
     # Criando variável que contém o número de tiros realizados, dentro do dicionário com dados do jogo. 
     game_data['Shots taken'] = 0
     # Criando variável que contém o número de blindados/inimigos que precisam ser destruídos para cumprir a missão, dentro do dicionário com dados do jogo. 
@@ -130,28 +133,61 @@ def game_screen(screen,game_data):
         # Atualizando estado do jogo.
         all_sprites.update()
 
+        # Caso o número de inimigos destruídos atinja o necessário para o Big_enemy aparecer, ele aparece.
+        if enemy_down % to_Big_enemy_appear == 0 and enemy_down != 0 and enemy_down != enemy_down_now:
+            enemy_down_now = enemy_down
+            assets[danger].play()
+            ENEMY = Big_enemy(assets)
+            all_sprites.add(ENEMY)
+            all_enemies.add(ENEMY)
+            enemy_created += 1
+
         if STATE == PLAYING:
-            # Verificando se houve colisão entre o projétil e o inimigo, entre o projétil e o "chão", entre o inimigo e o obuseiro, entre o foguete e o "chão", entre o foguete e o inimigo e entre a mina e o inimigo.
-            hits = py.sprite.groupcollide(all_enemies, all_shells, True, True, py.sprite.collide_mask)
+            # Verificando se houve colisão entre o projétil e o inimigo (ou Big_enemy), entre o projétil e o "chão", entre o inimigo e o obuseiro, entre o foguete e o "chão", entre o foguete e o inimigo e entre a mina e o inimigo.
+            hits = py.sprite.groupcollide(all_enemies, all_shells, False, True, py.sprite.collide_mask)
             hits2 = py.sprite.groupcollide(all_enemies, all_rockets, True, True, py.sprite.collide_mask)
             misses = py.sprite.spritecollide(floor, all_shells, True, py.sprite.collide_mask)
             misses2 = py.sprite.spritecollide(floor, all_rockets, True, py.sprite.collide_mask)
             collision = py.sprite.spritecollide(player, all_enemies, True, py.sprite.collide_mask)
             mine_hit = py.sprite.spritecollide(mine, all_enemies, True, py.sprite.collide_mask)
-            # O inimigo destruído precisa ser recriado.
+            
             for enemy in hits:
-                consecutive_hits_for_air_support += 1
-                consecutive_hits_for_submarine_support += 1
-                assets[explosion_hit].play()
-                if enemy_created < game_data['Mission']: # --> Não aparecer inimigos a mais do que a missão já estebelece.
-                    e = Enemy_tank(assets,r.choice([1,2,3]))
-                    all_sprites.add(e)
-                    all_enemies.add(e)
-                    enemy_created += 1
-                # No lugar do inimigo destruído, adicionando uma explosão.
-                explosion = Explosion2(enemy.rect.centerx,enemy.rect.centery - 55,assets)
-                all_sprites.add(explosion)
-                enemy_down +=1 
+                # Caso NÃO seja o Big_enemy.
+                if enemy.image != assets[big_enemy]:
+                    consecutive_hits_for_air_support += 1
+                    consecutive_hits_for_submarine_support += 1
+                    assets[explosion_hit].play()
+                    enemy.kill()
+                    if enemy_created < game_data['Mission']: # --> Não aparecer inimigos a mais do que a missão já estebelece.
+                        e = Enemy_tank(assets,r.choice([1,2,3]))
+                        all_sprites.add(e)
+                        all_enemies.add(e)
+                        enemy_created += 1
+                    # No lugar do inimigo destruído, adicionando uma explosão.
+                    explosion = Explosion2(enemy.rect.centerx,enemy.rect.centery - 55,assets)
+                    all_sprites.add(explosion)
+                    enemy_down +=1
+                # Caso seja o Big_enemy.
+                else:
+                    consecutive_hits_for_air_support += 1
+                    consecutive_hits_for_submarine_support += 1
+                    enemy.HITS()
+                    # Caso tenha morrido.
+                    if enemy.lives == 0:
+                        assets[explosion_hit].play()
+                        if enemy_created < game_data['Mission']: # --> Não aparecer inimigos a mais do que a missão já estebelece.
+                            e = Enemy_tank(assets,r.choice([1,2,3]))
+                            all_sprites.add(e)
+                            all_enemies.add(e)
+                            enemy_created += 1
+                        # No lugar do inimigo destruído, adicionando uma explosão.
+                        explosion = Explosion2(enemy.rect.centerx,enemy.rect.centery - 55,assets)
+                        all_sprites.add(explosion)
+                        enemy_down +=1
+                    else:
+                        assets[big_enemy_hit].play()
+                        explosion = Explosion(enemy.rect.centerx,enemy.rect.centery - 55,assets)
+                        all_sprites.add(explosion)
             for enemy in mine_hit:
                 assets[explosion_hit].play()
                 mine.kill() # --> A mina some da tela, mas continua no mesmo lugar.
@@ -214,7 +250,7 @@ def game_screen(screen,game_data):
                         all_sprites.add(e)
                         all_enemies.add(e)
                         enemy_created += 1
-                        not_same+=1
+                        not_same += 1
                     # No lugar do inimigo destruído, adicionando uma explosão.
                     explosion = Explosion2(enemy.rect.centerx,enemy.rect.centery - 55,assets)
                     all_sprites.add(explosion)
