@@ -1,4 +1,4 @@
-# Importando as bibliotecas necessárias.
+# Importando...
 import pygame as py
 from values import GAME,INTRO,QUIT,INCEPTION,WIDTH,HEIGHT,GAMEOVER,VICTORY,TRYAGAIN
 from screens import intro_screen,inception_screen,gameover_screen,tryagain_screen,victory_screen

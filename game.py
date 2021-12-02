@@ -1,9 +1,9 @@
-# Importando as bibliotecas necessárias.
+# Importando...
 import pygame as py
 import random as r
-from assets import load_assets, explosion_hit, explosion_miss, background, tank_info, mission,plane_sound,missile_sound,plane_info,submarine_info,call,call2,shell_info,ruler,support,big_enemy,big_enemy_hit,danger
-from sprites import Big_enemy, Enemy_tank, Explosion, Explosion2, Ground, Howitzer, Mine, Missile_Down, Plane, Sergeant
-from values import BLACK, EXPLODING, FPS, HEIGHT, HOWITZER_WIDTH, PLANE_INFO_WIDTH, PLAYING, QUIT, RED, RULER_WIDTH,TRYAGAIN,VICTORY,WIDTH,SUBMARINE_INFO_WIDTH
+from assets import load_assets,explosion_hit,explosion_miss,background,tank_info,mission,plane_sound,missile_sound,plane_info,submarine_info,call,call2,shell_info,ruler,support,big_enemy,big_enemy_hit,danger
+from sprites import Big_enemy,Enemy_tank,Explosion,Explosion2,Ground,Howitzer,Mine,Missile_Down,Plane,Sergeant
+from values import BLACK,EXPLODING,FPS,HEIGHT,HOWITZER_WIDTH,PLANE_INFO_WIDTH,PLAYING,QUIT,RED,RULER_WIDTH,TRYAGAIN,VICTORY,WIDTH,SUBMARINE_INFO_WIDTH
 from screens import pause_screen,ocean_screen
 
 # Criando a função com a estrutura fundamental do jogo.
@@ -34,21 +34,21 @@ def game_screen(screen,game_data):
     all_sprites.add(mine)
     # Criando variável que contém o número de blindados/inimigos destruídos. 
     enemy_down = 0
+    enemy_down_now = 0
     # Criando variável que contém o número de blindados/inimigos criados. 
     enemy_created = 0
-    enemy_down_now = 0
     # Criando variável com a quantidade de inimigos que precisam ser destruídos para o Big_enemy aparecer.
     to_Big_enemy_appear = 5
     # Criando variável que contém o número de tiros realizados, dentro do dicionário com dados do jogo. 
     game_data['Shots taken'] = 0
     # Criando variável que contém o número de blindados/inimigos que precisam ser destruídos para cumprir a missão, dentro do dicionário com dados do jogo. 
-    game_data['Mission'] = 20
+    game_data['Mission'] = r.choice([15,20,25,30])
     # Criando variáveis que serão usadas em caso de suporte aéreo.
     air_support = False # --> True quando o suporte aéreo for ativado.
     activate_air_support = False # --> True quando o suporte aéreo pode ser ativado/está na "espera" (ícone do avião aparece no canto direito).
     to_get_air_support = 2 # --> Quantos inimigos precisa destruír consecutivamente (sem erros) para conseguir suporte aéreo.
     consecutive_hits_for_air_support = 0
-    # Criando variável que vai ser usada para o suporte topográfico (dar o alcance médio no terreno, de cada carga, para o jogador).
+    # Criando variável que vai ser usada para o suporte topográfico (dar o alcance médio no terreno, de cada carga de projeção, para o jogador).
     topografic_support = False
     activate_topographic_support = False
     to_get_topographic_support = game_data['Mission']/2 # --> Quando chegar na metade do objetivo, o suporte topográfico poderá ser acionado.
@@ -61,7 +61,7 @@ def game_screen(screen,game_data):
     support_sound_air = True
     support_sound_topo = True
     support_sound_sub = True
-    # Criando o inimigo.
+    # Criando os inimigos.
     for i in range(3):
         enemy = Enemy_tank(assets,i+1)
         all_sprites.add(enemy)
@@ -122,11 +122,11 @@ def game_screen(screen,game_data):
                         assets[call2].play()
                         submarine_support = True # --> Ativando suporte do submarino.
                         activate_submarine_support = False # --> Ícone some da tela.
-                        STATE = ocean_screen(screen) # --> Mostra a tela do oceano com o submarino.
+                        STATE = ocean_screen(screen) # --> Mostra a tela do oceano com o submarino lançando o míssel balístico.
                         assets[missile_sound].play()
-                        missile = Missile_Down(assets,(WIDTH/2,0)) # --> Assim quando volta para a tela original do jogo, aparece o míssel vindo do céu.
+                        missile = Missile_Down(assets,(WIDTH/2,0)) # --> Assim quando volta para a tela original do jogo, aparece o míssel balístico vindo do céu.
                         all_sprites.add(missile)
-                    # Caso o jogador queira uma pausa...
+                    # Caso o jogador queira uma pausa, aperta a tecla "P".
                     elif event.key == py.K_p:
                         STATE = pause_screen(screen)
 
@@ -223,7 +223,7 @@ def game_screen(screen,game_data):
                 assets[explosion_miss].play()
                 explosion = Explosion(rocket.rect.centerx,rocket.rect.centery - 30,assets)
                 all_sprites.add(explosion)
-            # Caso o inimigo atinja o obuseiro (player), GAME OVER.
+            # Caso o inimigo atinja o obuseiro (player), TRY AGAIN.
             for enemy in collision:
                 assets[explosion_hit].play()
                 player.kill()

@@ -1,8 +1,8 @@
-# Importando as bibliotecas necessárias.
+# Importando...
 import pygame as py
 import random as r
 from assets import shell,sergeant,howitzer,tank1,tank2,tank3,ground,shooting,shout,explosion_animation,explosion_animation2,plane,rocket_sound,rocket,smoke_animation,mine,submarine,missile_down,missile_up,big_enemy
-from values import GROUND_HEIGHT, HEIGHT, HOWITZER_HEIGHT, HOWITZER_WIDTH, MINE_HEIGHT, PLANE_WIDTH, SERGEANT_HEIGHT, SERGEANT_WIDTH, SUBMARINE_WIDTH, TANK_HEIGHT, WIDTH
+from values import GROUND_HEIGHT,HEIGHT,HOWITZER_HEIGHT,HOWITZER_WIDTH,MINE_HEIGHT,PLANE_WIDTH,SERGEANT_HEIGHT,SERGEANT_WIDTH,SUBMARINE_WIDTH,TANK_HEIGHT,WIDTH
 
 # Criando o objeto Ground ("chão" do jogo).
 class Ground(py.sprite.Sprite):

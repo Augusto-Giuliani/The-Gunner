@@ -1,8 +1,8 @@
-# Importando as bibliotecas necessárias.
+# Importando...
 import pygame as py
-from assets import intro,inception,tryagain,gameover,victory,pause,submarine_sound,ocean_background,the_mission,details, load_assets
+from assets import intro,inception,tryagain,gameover,victory,pause,submarine_sound,ocean_background,the_mission,details,details2,load_assets
 from sprites import Submarine
-from values import GAMEOVER, HEIGHT, INCEPTION,INTRO, PLAYING,QUIT,GAME, TRYAGAIN, VICTORY,RED,FPS
+from values import GAMEOVER,HEIGHT,INCEPTION,INTRO,PLAYING,QUIT,GAME,TRYAGAIN,VICTORY,RED,FPS
 
 # Criando a função que plota a tela INTRO e retorna o estado do jogo.
 def intro_screen(screen):
@@ -54,6 +54,7 @@ def inception_screen(screen):
                     running = False
                     state = the_mission_screen(screen)
                     state = details_screen(screen)
+                    state = details2_screen(screen)
         # Mostrando novo frame para o jogador.
         py.display.update()
     # Retorna o novo/mesmo estado do jogo, dando prosseguimento ao jogo ou continuando no mesmo lugar.
@@ -83,7 +84,7 @@ def the_mission_screen(screen):
     # Retorna o novo/mesmo estado do jogo, dando prosseguimento ao jogo ou continuando no mesmo lugar.
     return state
 
-# Criando a função que plota a tela de THE_MISSION e retorna o estado do jogo.
+# Criando a função que plota a tela de DETAILS e retorna o estado do jogo.
 def details_screen(screen):
     assets = load_assets() # --> criando o dicionário com os assets
     # Criando loop que trata eventos e redesenha o fundo.
@@ -102,6 +103,30 @@ def details_screen(screen):
                     running = False
         # Redesenhando o fundo a cada loop.
         screen.blit(assets[details],(0,0))
+        # Mostrando novo frame para o jogador.
+        py.display.update()
+    # Retorna o novo/mesmo estado do jogo, dando prosseguimento ao jogo ou continuando no mesmo lugar.
+    return state
+
+# Criando a função que plota a tela de DETAILS2 e retorna o estado do jogo.
+def details2_screen(screen):
+    assets = load_assets() # --> criando o dicionário com os assets
+    # Criando loop que trata eventos e redesenha o fundo.
+    running = True
+    state = GAME
+    while running:
+        # Processa os eventos.
+        for event in py.event.get():
+            # Verifica se foi fechado (" botão X").
+            if event.type == py.QUIT:
+                state = QUIT
+                running = False
+            # Verifica se o usuário apertou a tecla "Espaço".
+            elif event.type == py.KEYDOWN:
+                if event.key == py.K_SPACE:
+                    running = False
+        # Redesenhando o fundo a cada loop.
+        screen.blit(assets[details2],(0,0))
         # Mostrando novo frame para o jogador.
         py.display.update()
     # Retorna o novo/mesmo estado do jogo, dando prosseguimento ao jogo ou continuando no mesmo lugar.
@@ -167,7 +192,7 @@ def pause_screen(screen):
                 running = False
             # Verifica se o usuário apertou alguma tecla.
             elif event.type == py.KEYDOWN:
-                if event.key == py.K_p: # --> Usuário apertou "p", termina o loop e volta para  o jogo.
+                if event.key == py.K_p: # --> Usuário apertou "P", termina o loop e volta para  o jogo.
                     running = False
         # Redesenhando o fundo a cada loop.
         screen.blit(assets[pause],(0,0))
@@ -207,12 +232,12 @@ def victory_screen(screen,game_data):
         screen.blit(assets[victory],(0,0))
         # Desenhando dados do jogo.
         font = py.font.SysFont(None,45)
-        # Número de tiros realizados, performance/eficiência (tiros por inimigo) e nota.
+        # Número de tiros realizados, performance/eficiência (tiros por inimigo) e classificação.
         performance = game_data['Shots taken']/game_data['Mission']
         rating = ''
-        if performance <= 0.5:
+        if performance <= 0.85:
             rating = 'Gunner'
-        elif performance <= 1:
+        elif performance <= 1.35:
             rating = 'Profissional'
         elif performance <= 2:
             rating = 'Iniciante'

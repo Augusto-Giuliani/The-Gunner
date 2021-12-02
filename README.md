@@ -7,6 +7,10 @@ Logo do jogo:
 
 ![plot](images/thegunnerLOGO.png)
 
-Link com o vídeo mostrando o jogo: https://youtu.be/3xFEpO3EAvk
+Link com o vídeo mostrando o jogo: https://youtu.be/wKD6xLcEQXo
 
-### **Descrição:  Um jogo de artilharia. O usuário será um sargento do Exército Brasileiro, que está sob o comando de uma peça de artilharia (ex: canhão). Seu objetivo é abater alvos inimigos para defender sua posição estratégica. O usuário poderá alterar a carga de projeção (que determina a velocidade do projétil/granada).**
+Planejamento das telas/screens do jogo:
+
+![plot](images/planning_screens.png)
+
+### **Descrição:  Um jogo de artilharia. O usuário será um sargento, que está sob o comando de uma peça de artilharia (no caso do jogo, um obuseiro). Seu objetivo é abater alvos inimigos que fazem parte de um movimento terrorista. O usuário poderá alterar a carga de projeção (que determina a velocidade do projétil/granada), acionar suportes que estão a sua disposição, dar pausa no jogo e receberá um feedback sobre a sua performance, em caso de vitória. Para jogar, rode o arquivo THE_GUNNER.py.**

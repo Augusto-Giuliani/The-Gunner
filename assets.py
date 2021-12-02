@@ -1,7 +1,8 @@
-# Importando as bibliotecas necessárias.
+# Importando...
 import pygame as py
 import os
-from values import GROUND_HEIGHT, HEIGHT, HOWITZER_HEIGHT, HOWITZER_WIDTH, IMG, MISSION_HEIGHT,MISSION_WIDTH, SERGEANT_HEIGHT, SERGEANT_WIDTH, SHELL_HEIGHT, SHELL_WIDTH,SOUND, TANK_HEIGHT, TANK_INFO_HEIGHT, TANK_INFO_WIDTH, TANK_WIDTH, WIDTH,PLANE_HEIGHT,PLANE_WIDTH,PLANE_INFO_HEIGHT,PLANE_INFO_WIDTH,ROCKET_HEIGHT,ROCKET_WIDTH,SHELL_INFO_HEIGHT,SHELL_INFO_WIDTH,RULER_HEIGHT,RULER_WIDTH,MINE_HEIGHT,MINE_WIDTH,SUBMARINE_HEIGHT,SUBMARINE_WIDTH,MISSILE_HEIGHT,MISSILE_WIDTH,SUBMARINE_INFO_HEIGHT,SUBMARINE_INFO_WIDTH
+from values import GROUND_HEIGHT,HEIGHT,HOWITZER_HEIGHT,HOWITZER_WIDTH,IMG,MISSION_HEIGHT,MISSION_WIDTH,SERGEANT_HEIGHT,SERGEANT_WIDTH,SHELL_HEIGHT,SHELL_WIDTH,SOUND,TANK_HEIGHT,TANK_INFO_HEIGHT,TANK_INFO_WIDTH,TANK_WIDTH,WIDTH,PLANE_HEIGHT,PLANE_WIDTH,PLANE_INFO_HEIGHT,PLANE_INFO_WIDTH,ROCKET_HEIGHT,ROCKET_WIDTH,SHELL_INFO_HEIGHT,SHELL_INFO_WIDTH,RULER_HEIGHT,RULER_WIDTH,MINE_HEIGHT,MINE_WIDTH,SUBMARINE_HEIGHT,SUBMARINE_WIDTH,MISSILE_HEIGHT,MISSILE_WIDTH,SUBMARINE_INFO_HEIGHT,SUBMARINE_INFO_WIDTH
+
 # Criando variáveis para cada asset.
 intro = 'intro_screen'
 inception = 'inception_screen'
@@ -48,7 +49,9 @@ danger = 'danger'
 big_enemy = 'big_enemy'
 big_enemy_hit = 'big_enemy_hit'
 details = 'details_screen'
+details2 = 'details2_screen'
 the_mission = 'the_mission_screen'
+
 # Criando a função que carrega os arquivos de cada asset em um dicionário.
 def load_assets():
     assets = dict()
@@ -62,6 +65,8 @@ def load_assets():
     assets[the_mission] = py.transform.scale(assets['the_mission_screen'],(WIDTH,HEIGHT))
     assets[details] = py.image.load(os.path.join(IMG,'details.png')).convert()
     assets[details] = py.transform.scale(assets['details_screen'],(WIDTH,HEIGHT))
+    assets[details2] = py.image.load(os.path.join(IMG,'details2.png')).convert()
+    assets[details2] = py.transform.scale(assets['details2_screen'],(WIDTH,HEIGHT))
     assets[gameover] = py.image.load(os.path.join(IMG,'gameover.png')).convert()
     assets[gameover] = py.transform.scale(assets['gameover_screen'],(WIDTH,HEIGHT))
     assets[tryagain] = py.image.load(os.path.join(IMG,'tryagain.png')).convert()

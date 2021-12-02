@@ -1,4 +1,4 @@
-# Importando as bibliotecas necessárias.
+# Importando...
 from os import path
 
 # Estabelecendo a pasta que contem as figuras/backgrounds e sons/trilha sonoras.
@@ -6,8 +6,8 @@ IMG = path.join(path.dirname(__file__),'images')
 SOUND = path.join(path.dirname(__file__),'sounds')
 
 # Dados gerais.
-WIDTH = 1300 # --> Largura da tela
-HEIGHT = 700 # --> Altura da tela
+WIDTH = 1300 
+HEIGHT = 700 
 TANK_WIDTH = 80
 TANK_HEIGHT = 50
 TANK_INFO_WIDTH = 110
